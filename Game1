@@ -1,0 +1,120 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+
+namespace GTA3D
+{
+    public class Game1 : Game
+    {
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
+        Texture2D texture;
+
+        int yukseklik = 100;
+        int uzunluk = 50;
+        int genislik = 50;
+        float yon = 0f;
+        Vector2 koordinat = new Vector2(100, 100);
+
+        Vector2 kamera = Vector2.Zero;
+
+        public Game1()
+        {
+            graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+        }
+
+        protected override void Initialize()
+        {
+            graphics.PreferredBackBufferWidth = 800;
+            graphics.PreferredBackBufferWidth = 600;
+            graphics.IsFullScreen = true;
+            graphics.ApplyChanges();
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+        }
+
+        protected override void Update(GameTime gameTime)
+        {
+            KeyboardState klavye = Keyboard.GetState();
+            if (klavye.IsKeyDown(Keys.Left) && klavye.IsKeyDown(Keys.Up))
+            {
+                kamera.X -= 3;
+                kamera.Y -= 3;
+                yon = (float)(5 * Math.PI / 4);
+            }
+            else if (klavye.IsKeyDown(Keys.Left) && klavye.IsKeyDown(Keys.Down))
+            {
+                kamera.X -= 3;
+                kamera.Y += 3;
+                yon = (float)(3 * Math.PI / 4);
+            }
+            else if (klavye.IsKeyDown(Keys.Right) && klavye.IsKeyDown(Keys.Up))
+            {
+                kamera.X += 3;
+                kamera.Y -= 3;
+                yon = (float)(7 * Math.PI / 4);
+            }
+            else if (klavye.IsKeyDown(Keys.Right) && klavye.IsKeyDown(Keys.Down))
+            {
+                kamera.X += 3;
+                kamera.Y += 3;
+                yon = (float)(Math.PI / 4);
+            }
+            else if (klavye.IsKeyDown(Keys.Left))
+            {
+                kamera.X -= 5;
+                yon = (float)(Math.PI);
+            }
+            else if (klavye.IsKeyDown(Keys.Right))
+            {
+                kamera.X += 5;
+                yon = 0f;
+            }
+            else if (klavye.IsKeyDown(Keys.Up))
+            {
+                kamera.Y -= 5;
+                yon = (float)(3 * Math.PI / 2);
+            }
+            else if (klavye.IsKeyDown(Keys.Down))
+            {
+                kamera.Y += 5;
+                yon = (float)(Math.PI / 2);
+            }
+            base.Update(gameTime);
+        }
+
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin();
+            texture = Content.Load<Texture2D>("t");
+            spriteBatch.Draw(texture, new Rectangle(-220 - (int)kamera.X, -210 - (int)kamera.Y, texture.Width, texture.Height), Color.White);
+            texture = Content.Load<Texture2D>("yumruk");
+            spriteBatch.Draw(texture, new Rectangle(400, 300, 18, 43), new Rectangle(0, 0, 18, 43), Color.White, yon, new Vector2(9, 21), SpriteEffects.None, 0);
+            texture = Content.Load<Texture2D>("mahalleler");
+            for (int i = 0; i < yukseklik; i++)
+            {
+                if (kamera.X + (graphics.PreferredBackBufferWidth / 2) > koordinat.X)
+                    spriteBatch.Draw(texture, new Rectangle((int)(koordinat.X - kamera.X) + (int)((koordinat.X - kamera.X - (graphics.PreferredBackBufferWidth / 2)) * i / (3 * yukseklik)) + (i / 4) + genislik / 2, (int)(koordinat.Y - kamera.Y) + (int)((koordinat.Y - kamera.Y - (graphics.PreferredBackBufferHeight / 2)) * i / (3 * yukseklik)), uzunluk + i / 2, 1), new Rectangle(2 * genislik, yukseklik - (i + 1), uzunluk, 1), Color.White, (float)Math.PI / 2, new Vector2(uzunluk / 2, 0), SpriteEffects.FlipHorizontally, 0);
+                if (kamera.X + (graphics.PreferredBackBufferWidth / 2) < koordinat.X)
+                    spriteBatch.Draw(texture, new Rectangle((int)(koordinat.X - kamera.X) + (int)((koordinat.X - kamera.X - (graphics.PreferredBackBufferWidth / 2)) * i / (3 * yukseklik)) - (i / 4) - genislik / 2, (int)(koordinat.Y - kamera.Y) + (int)((koordinat.Y - kamera.Y - (graphics.PreferredBackBufferHeight / 2)) * i / (3 * yukseklik)), uzunluk + i / 2, 1), new Rectangle(3 * genislik + uzunluk, yukseklik - (i + 1), uzunluk, 1), Color.White, (float)Math.PI * 3 / 2, new Vector2(uzunluk / 2, 0), SpriteEffects.FlipHorizontally, 0);
+                if (kamera.Y + (graphics.PreferredBackBufferHeight / 2) > koordinat.Y)
+                    spriteBatch.Draw(texture, new Rectangle((int)(koordinat.X - kamera.X) + (int)((koordinat.X - kamera.X - (graphics.PreferredBackBufferWidth / 2)) * i / (3 * yukseklik)), (i / 4) + (int)(koordinat.Y - kamera.Y) + uzunluk / 2 + (int)((koordinat.Y - kamera.Y - (graphics.PreferredBackBufferHeight / 2)) * i / (3 * yukseklik)), genislik + i / 2, 1), new Rectangle(genislik, yukseklik - (i + 1), genislik, 1), Color.White, 0, new Vector2(genislik / 2, 0), SpriteEffects.None, 0);
+                if (kamera.Y + (graphics.PreferredBackBufferHeight / 2) < koordinat.Y)
+                    spriteBatch.Draw(texture, new Rectangle((int)(koordinat.X - kamera.X) + (int)((koordinat.X - kamera.X - (graphics.PreferredBackBufferWidth / 2)) * i / (3 * yukseklik)), -(i / 4) + (int)(koordinat.Y - kamera.Y) - uzunluk / 2 + (int)((koordinat.Y - kamera.Y - (graphics.PreferredBackBufferHeight / 2)) * i / (3 * yukseklik)), genislik + i / 2, 1), new Rectangle(2 * genislik + uzunluk, yukseklik - (i + 1), genislik, 1), Color.White, (float)Math.PI, new Vector2(genislik / 2, 0), SpriteEffects.None, 0);
+            }
+            spriteBatch.Draw(texture, new Rectangle((int)(koordinat.X - kamera.X) + (int)((koordinat.X - kamera.X - (graphics.PreferredBackBufferWidth / 2)) / 3), (int)(koordinat.Y - kamera.Y) + (int)((koordinat.Y - kamera.Y - (graphics.PreferredBackBufferHeight / 2)) / 3), genislik + yukseklik / 2, uzunluk + yukseklik / 2), new Rectangle(0, 0, genislik, uzunluk), Color.White, 0, new Vector2(genislik / 2, uzunluk / 2), SpriteEffects.None, 0);
+            spriteBatch.End();
+            base.Draw(gameTime);
+        }
+    }
+}
